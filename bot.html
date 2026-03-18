@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+    .user { color: blue; margin: 5px 0; }
+    .bot { color: green; margin: 5px 0; }
+    #controls { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Medical Chatbot 🤖</h2>
+  <div id="chat"></div>
+
+  <div id="controls">
+    <input type="text" id="userInput" placeholder="Type your message..." size="50">
+    <button onclick="sendMessage()">Send</button>
+    <!-- <button onclick="startVoice()">🎤 Speak</button> -->
+  </div>
+
+  <audio id="ttsAudio" controls hidden></audio>
+
+  <script src="script2.js"></script>
+</body>
+</html>

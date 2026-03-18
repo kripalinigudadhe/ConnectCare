@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker - Rural Health Connect</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+               
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="symptom-checker.html" class="active">Symptom Checker</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="bot.html">Virtual doctor</a></li>
+                <li><a href="map.html">Show Nearby Hospitals</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="symptom-checker">
+                <div class="checker-header">
+                    <h2>Symptom Checker</h2>
+                    <p>Tell us about your symptoms and we'll help determine the appropriate level of care</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <form id="symptomForm" class="symptom-form">
+                    <div class="question-container" id="questionContainer">
+                        <!-- Questions will be dynamically loaded here -->
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">Previous</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Get Results</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Rural Health Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="symptom-checker.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MedCare Assistant - Nearby Hospitals</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 500px;
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🩺 MedCare Assistant</h1>
+
+  <!-- Hospital Map -->
+  <h2>Nearby Hospitals (Top 5–7)</h2>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    let map;
+
+    // Initialize map
+    function initMap(lat, lon) {
+      map = L.map("map").setView([lat, lon], 14);
+
+      // Add OpenStreetMap tiles
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+
+      // Add marker for user's location
+      L.marker([lat, lon])
+        .addTo(map)
+        .bindPopup("You are here")
+        .openPopup();
+
+      // Query Overpass API for nearby hospitals
+      fetchHospitals(lat, lon);
+    }
+
+    // Fetch hospitals using Overpass API
+    function fetchHospitals(lat, lon) {
+      const radius = 7000; // 7 km for better coverage
+      const query = `
+        [out:json];
+        (
+          node["amenity"="hospital"](around:${radius},${lat},${lon});
+          way["amenity"="hospital"](around:${radius},${lat},${lon});
+          relation["amenity"="hospital"](around:${radius},${lat},${lon});
+        );
+        out center;
+      `;
+      
+      const url = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query);
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.elements.length === 0) {
+            alert("No hospitals found nearby.");
+          }
+
+          // Sort hospitals by distance from user
+          let hospitals = data.elements.map(element => {
+            let hospitalLat = element.lat || element.center?.lat;
+            let hospitalLon = element.lon || element.center?.lon;
+            let hospitalName = element.tags?.name || "Unnamed Hospital";
+
+            // Compute distance (Haversine formula)
+            const R = 6371e3; // meters
+            const φ1 = lat * Math.PI/180;
+            const φ2 = hospitalLat * Math.PI/180;
+            const Δφ = (hospitalLat-lat) * Math.PI/180;
+            const Δλ = (hospitalLon-lon) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const d = R * c; // distance in meters
+
+            return { lat: hospitalLat, lon: hospitalLon, name: hospitalName, distance: d };
+          });
+
+          // Sort by distance and take top 7
+          hospitals = hospitals.sort((a, b) => a.distance - b.distance).slice(0, 7);
+
+          hospitals.forEach(hospital => {
+            L.marker([hospital.lat, hospital.lon])
+              .addTo(map)
+              .bindPopup(`<b>${hospital.name}</b><br>Distance: ${(hospital.distance/1000).toFixed(2)} km`);
+          });
+        })
+        .catch(err => {
+          console.error("Error fetching hospital data:", err);
+        });
+    }
+
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          initMap(position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          alert("Geolocation failed. Showing default location.");
+          initMap(19.0760, 72.8777); // Default: Mumbai
+        }
+      );
+    } else {
+      alert("Your browser does not support geolocation.");
+      initMap(19.0760, 72.8777); // Default: Mumbai
+    }
+  </script>
+</body>
+</html>
